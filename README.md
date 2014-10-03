@@ -1,7 +1,7 @@
 # MissingValidators
 
 [![Build Status](https://travis-ci.org/andrewgr/missing_validators.png)](https://travis-ci.org/andrewgr/missing_validators)
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/andrewgr/missing_validators)
+[![Code Climate](https://codeclimate.com/github/andrewgr/missing_validators/badges/gpa.svg)](https://codeclimate.com/github/andrewgr/missing_validators)
 
 MissingValidators is a collection of custom validators that are often required in Rails applications plus shoulda-style RSpec matchers to test the validation rules.
 
@@ -142,6 +142,100 @@ RSpec matcher is also available for your convenience:
     describe Device do
       it { should ensure_valid_mac_address_format_of }
     end
+
+### ColorValidator
+
+Ensures that the color is a hexadecimal value starting with '#':
+
+With an ActiveRecord model:
+
+    class Widget < ActiveRecord::Base
+      attr_accessor :color
+      validates :color, color: true
+    end
+
+Or any ruby class:
+
+    class Widget
+      include ActiveModel::Validations
+      attr_accessor :color
+      validates :color, color: true
+    end
+
+RSpec matcher is not available yet.
+
+### ImeiValidator
+
+Ensures that IMEI is in one of the following formats:
+
+    '356843052637512'
+    '35-6843052-637512'
+    '35.6843052.637512'
+
+and its check digit is correct.
+
+With an ActiveRecord model:
+
+    class Phone < ActiveRecord::Base
+      attr_accessor :imei
+      validates :imei, imei: true
+    end
+
+Or any ruby class:
+
+    class Phone
+      include ActiveModel::Validations
+      attr_accessor :imei
+      validates :imei, imei: true
+    end
+
+RSpec matcher is also available for your convenience:
+
+    describe Phone do
+      it { should ensure_valid_imei_format_of }
+    end
+
+### LatitudeValidator
+
+Ensures that the value is between -90 and 90:
+
+With an ActiveRecord model:
+
+    class Coordinate < ActiveRecord::Base
+      attr_accessor :latitude
+      validates :latitude, latitude: true
+    end
+
+Or any ruby class:
+
+    class Coordinate
+      include ActiveModel::Validations
+      attr_accessor :latitude
+      validates :latitude, latitude: true
+    end
+
+RSpec matcher is not available yet.
+
+### LongitudeValidator
+
+Ensures that the value is between -180 and 180:
+
+With an ActiveRecord model:
+
+    class Coordinate < ActiveRecord::Base
+      attr_accessor :longitude
+      validates :longitude, longitude: true
+    end
+
+Or any ruby class:
+
+    class Coordinate
+      include ActiveModel::Validations
+      attr_accessor :longitude
+      validates :longitude, longitude: true
+    end
+
+RSpec matcher is not available yet.
 
 ## Contributing
 
