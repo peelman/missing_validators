@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/andrewgr/missing_validators.png)](https://travis-ci.org/andrewgr/missing_validators)
 [![Code Climate](https://codeclimate.com/github/andrewgr/missing_validators/badges/gpa.svg)](https://codeclimate.com/github/andrewgr/missing_validators)
+[![Test Coverage](https://codeclimate.com/github/andrewgr/missing_validators/badges/coverage.svg)](https://codeclimate.com/github/andrewgr/missing_validators/coverage)
+[![Gem Version](https://badge.fury.io/rb/missing_validators.svg)](http://badge.fury.io/rb/missing_validators)
 
 MissingValidators is a collection of custom validators that are often required in Rails applications plus shoulda-style RSpec matchers to test the validation rules.
 
@@ -40,9 +42,11 @@ Or any ruby class:
 
 You can specify domains to which the email domain should belong in one of the folowing ways:
 
-    validates :email, email: { domains: 'com' }
-    validates :email, email: { domains: :com }
-    validates :email, email: { domains: [:com, 'edu'] }
+    validates :email, email: { domains: '.com' }
+    validates :email, email: { domains: 'example.org' }
+    validates :email, email: { domains: ['.com', '.edu', 'example.org'] }
+
+Please note that if a domain is specified as a sting starting with "." (for example, ".com") then the valid values should be in the subdomains of this domain (for example, "email@example.com" or "user@subdomain.example.com"). If a domain is specified without leading "." (for example, "example.org"), then the valid values should be in this domain only (for example, "user@example.org" or "email@example.org", but not "email@subdomain.example.org").
 
 RSpec matcher is also available for your convenience:
 
@@ -94,7 +98,7 @@ With an ActiveRecord model:
 
     class Flight < ActiveRecord::Base
       attr_accessor :origin, :destination
-      validates :origin, inequality: { to: :destination }
+      validates :origin, inequality: { to: ->(o) { o.destination } }
     end
 
 Or any ruby class:
@@ -102,13 +106,7 @@ Or any ruby class:
     class Flight
       include ActiveModel::Validations
       attr_accessor :origin, :destination
-      validates :origin, inequality: { to: :destination }
-    end
-
-RSpec matcher is also available for your convenience:
-
-    describe Flight do
-      it { should ensure_inequality_of(:origin).to(:destination) }
+      validates :origin, inequality: { to: ->(o) { o.destination } }
     end
 
 ### MacAddressValidator

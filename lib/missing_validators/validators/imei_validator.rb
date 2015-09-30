@@ -1,19 +1,23 @@
-# Allows to check if the value of a specific attribute is a valid IMEI address.
+# Checks if the value of an attribute is a valid IMEI number.
 #
-# @example Validate that the device IMEI address is valid.
+# @example Validate that a device IMEI number is valid.
 #   class Device << ActiveRecord::Base
 #     attr_accessor :imei
 #     validates :imei, imei: true
 #   end
 class ImeiValidator < BaseValidator
-  def self.validate_format(imei_number)
-    !!(imei_number =~ /\A[\d\.\:\-\s]+\z/i) # 356843052637512 or 35-6843052-637512 or 35.6843052.637512
+  private
+
+  # 356843052637512 or 35-6843052-637512 or 35.6843052.637512
+  IMEI_FORMAT = /\A[\d\.\:\-\s]+\z/i
+
+  def validate_format(imei_number)
+    (imei_number =~ IMEI_FORMAT).present?
   end
 
-  def self.luhn_valid?(input)
-    numbers = input.gsub(/\D/, '').reverse
-
-    sum, i = 0, 0
+  def validate_luhn_checksum(numbers)
+    sum = 0
+    i = 0
 
     numbers.each_char do |ch|
       n = ch.to_i
@@ -21,16 +25,14 @@ class ImeiValidator < BaseValidator
       n = 1 + (n - 10) if n >= 10
 
       sum += n
-      i   += 1
+      i += 1
     end
 
     (sum % 10).zero?
   end
 
-  private
-
-  def self.valid?(imei, options)
-    validate_format(imei.to_s) \
-      && luhn_valid?(imei.to_s)
+  def valid?(imei, _)
+    validate_format(imei.to_s) && \
+      validate_luhn_checksum(imei.to_s.gsub(/\D/, '').reverse)
   end
 end
